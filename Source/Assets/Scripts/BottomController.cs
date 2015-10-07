@@ -20,7 +20,10 @@ public class BottomController : MonoBehaviour
 	private void OnCollisionEnter(Collision other)
 	{
 		if (other.gameObject.tag == "Ball")
+		{
+			PlayerController.Instance.Life--;
 			BallController.Instance.Reset();
+		}
 	}
 	#endregion
 	#endregion

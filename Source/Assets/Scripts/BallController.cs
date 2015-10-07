@@ -18,6 +18,9 @@ public class BallController : MonoBehaviour
 
 	#region Methods
 	#region Public
+	/// <summary>
+	/// Сбросить шарик в начальное состояние.
+	/// </summary>
 	public void Reset()
 	{
 		_rigidbody.isKinematic = true;

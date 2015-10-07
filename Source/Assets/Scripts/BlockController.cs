@@ -23,7 +23,7 @@ public class BlockController : MonoBehaviour
 		HitPoint--;
 		if (HitPoint == 0)
 		{
-			PlayerController.Instance.AddScore(Score);
+			PlayerController.Instance.Score += Score;
 			PlayerController.Instance.DestroyBlock();
 			Destroy(gameObject);
 		}
