@@ -10,7 +10,15 @@ public class PlayerController : MonoBehaviour
 	#region Public
 	public static PlayerController Instance;
 
+	public AudioClip AudioRebound;
+	public AudioClip AudioNewLive;
+	public AudioClip AudioDie;
+	public AudioClip AudioDestroyBlock;
+
 	public float FactorMove = 0.3f;
+	/// <summary>
+	/// Очки.
+	/// </summary>
 	public int Score
 	{
 		get
@@ -23,6 +31,9 @@ public class PlayerController : MonoBehaviour
 			InterfaceController.Instance.SetScore(_score);
 		}
 	}
+	/// <summary>
+	/// Оставшееся количество жизней.
+	/// </summary>
 	public int Life
 	{
 		get
@@ -33,6 +44,12 @@ public class PlayerController : MonoBehaviour
 		{
 			if (value < 0)
 				GameOver();
+
+			if (value > _life)
+				NewLive();
+			else if (value < _life)
+				DestroyPlayer();
+
 			_life = value;
 			InterfaceController.Instance.SetLife(_life);
 		}
@@ -43,6 +60,7 @@ public class PlayerController : MonoBehaviour
 	private int _score;
 	[SerializeField]
 	private int _life = 3;
+	private AudioSource _audioSource;
 	#endregion
 	#endregion
 
@@ -54,14 +72,36 @@ public class PlayerController : MonoBehaviour
 	public void DestroyBlock()
 	{
 		_countBlock--;
+
+		if (_audioSource != null && AudioDestroyBlock != null)
+			_audioSource.PlayOneShot(AudioDestroyBlock);
+
 		if (_countBlock <= 0)
 			GameOver();
+	}
+	/// <summary>
+	/// Дополнительная жизнь.
+	/// </summary>
+	public void NewLive()
+	{
+		if (_audioSource != null && AudioNewLive != null)
+			_audioSource.PlayOneShot(AudioNewLive);
+	}
+	/// <summary>
+	/// Уничтожить игрока.
+	/// </summary>
+	public void DestroyPlayer()
+	{
+		// TODO: анимация уничтожения игрока
+		if (_audioSource != null && AudioDie != null)
+			_audioSource.PlayOneShot(AudioDie);
 	}
 	#endregion
 	#region Private
 	private void Awake()
 	{
 		Instance = this;
+		_audioSource = GetComponent<AudioSource>();
 
 		_countBlock = GameObject.FindGameObjectsWithTag("Block").Length;
 		if (_countBlock <= 0)
@@ -81,6 +121,15 @@ public class PlayerController : MonoBehaviour
 		if (Mathf.Abs(pos.x) > MAX_X)
 			pos.x = ((pos.x < 0) ? -1 : 1) * MAX_X;
 		transform.position = pos;
+	}
+
+	private void OnCollisionExit(Collision other)
+	{
+		if (other.gameObject.tag == "Ball")
+		{
+			if (_audioSource != null && AudioRebound != null)
+				_audioSource.PlayOneShot(AudioRebound);
+		}
 	}
 	/// <summary>
 	/// Остновить игру и вывести на экран панель GameOver.

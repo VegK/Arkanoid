@@ -7,9 +7,11 @@ public class BlockController : MonoBehaviour
 	#region Public
 	public int HitPoint = 1;
 	public int Score = 1;
+
+	public AudioClip AudioBlow;
 	#endregion
 	#region Private
-
+	private AudioSource _audioSource;
 	#endregion
 	#endregion
 
@@ -18,14 +20,27 @@ public class BlockController : MonoBehaviour
 
 	#endregion
 	#region Private
+	private void Awake()
+	{
+		_audioSource = GetComponent<AudioSource>();
+	}
+
 	private void OnCollisionEnter(Collision other)
 	{
-		HitPoint--;
-		if (HitPoint == 0)
+		if (other.gameObject.tag == "Ball")
 		{
-			PlayerController.Instance.Score += Score;
-			PlayerController.Instance.DestroyBlock();
-			Destroy(gameObject);
+			HitPoint--;
+			if (HitPoint == 0)
+			{
+				PlayerController.Instance.Score += Score;
+				PlayerController.Instance.DestroyBlock();
+				Destroy(gameObject);
+			}
+			else
+			{
+				if (_audioSource != null && AudioBlow != null)
+					_audioSource.PlayOneShot(AudioBlow);
+			}
 		}
 	}
 	#endregion
