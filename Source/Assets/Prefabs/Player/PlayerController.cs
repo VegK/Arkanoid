@@ -119,7 +119,7 @@ public class PlayerController : MonoBehaviour
 			piece.gameObject.SetActive(true);
 			piece.AddExplosionForce(100, transform.position, 1f);
 		}
-		StartCoroutine(HideBlock());
+		StartCoroutine(HidePieces());
 	}
 	#endregion
 	#region Private
@@ -176,6 +176,43 @@ public class PlayerController : MonoBehaviour
 #endif
 	}
 
+    private void OnCollisionEnter(Collision other)
+	{
+		if (other.gameObject.tag == "Ball")
+		{
+			// Отражаем шарик в обратном направлении.
+			var reflection = false;
+			var pointContact = other.contacts[0].point;
+			var velocity = other.rigidbody.velocity;
+			var pos = other.gameObject.transform.position;
+
+			if (pointContact.x > transform.position.x)
+			{
+				if (velocity.x < 0)
+				{
+					velocity.x *= -1;
+					pos.x += (pointContact.x - pos.x) * 2;
+					reflection = true;
+				}
+			}
+			else if (pointContact.x < transform.position.x)
+			{
+				if (velocity.x > 0)
+				{
+					velocity.x *= -1;
+					pos.x -= Mathf.Abs(pointContact.x - pos.x) * 2;
+					reflection = true;
+				}
+			}
+
+			if (reflection)
+			{
+				other.gameObject.transform.position = pos;
+				other.rigidbody.velocity = velocity;
+			}
+		}
+	}
+
 	private void OnCollisionExit(Collision other)
 	{
 		if (other.gameObject.tag == "Ball")
@@ -216,7 +253,7 @@ public class PlayerController : MonoBehaviour
 		InterfaceController.Instance.GameOver(_score);
     }
 
-	private IEnumerator HideBlock()
+	private IEnumerator HidePieces()
 	{
 		Parameters.Instance.FixedGame = true;
 		var step = 0.05f;
