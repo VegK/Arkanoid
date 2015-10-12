@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEditor;
+using System.Collections.Generic;
+using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
@@ -15,6 +18,10 @@ public class PlayerController : MonoBehaviour
 	public AudioClip AudioDie;
 	public AudioClip AudioDestroyBlock;
 
+	public Material[] Materials;
+	public GameObject[] BaseObjects;
+
+	public int DestroyBlocksToWin = 15;
 	public float FactorMove = 0.3f;
 	/// <summary>
 	/// Очки.
@@ -43,7 +50,11 @@ public class PlayerController : MonoBehaviour
 		set
 		{
 			if (value < 0)
-				GameOver();
+			{
+				_gameOver = true;
+				DestroyPlayer();
+				return;
+            }
 
 			if (value > _life)
 				NewLive();
@@ -56,11 +67,16 @@ public class PlayerController : MonoBehaviour
 	}
 	#endregion
 	#region Private
-	private int _countBlock;
+	private bool _gameOver;
+	private int _destroyedBlocks;
 	private int _score;
 	[SerializeField]
 	private int _life = 3;
 	private AudioSource _audioSource;
+
+	private Vector3 _startPosition;
+	private Dictionary<int, Vector3> _piecesStartPosition;
+	private Rigidbody[] _piecesRigidbody;
 	#endregion
 	#endregion
 
@@ -71,12 +87,12 @@ public class PlayerController : MonoBehaviour
 	/// </summary>
 	public void DestroyBlock()
 	{
-		_countBlock--;
+		_destroyedBlocks++;
 
 		if (_audioSource != null && AudioDestroyBlock != null)
 			_audioSource.PlayOneShot(AudioDestroyBlock);
 
-		if (_countBlock <= 0)
+		if (_destroyedBlocks >= DestroyBlocksToWin)
 			GameOver();
 	}
 	/// <summary>
@@ -92,9 +108,18 @@ public class PlayerController : MonoBehaviour
 	/// </summary>
 	public void DestroyPlayer()
 	{
-		// TODO: анимация уничтожения игрока
 		if (_audioSource != null && AudioDie != null)
 			_audioSource.PlayOneShot(AudioDie);
+
+		foreach (GameObject obj in BaseObjects)
+			obj.SetActive(false);
+
+		foreach (Rigidbody piece in _piecesRigidbody)
+		{
+			piece.gameObject.SetActive(true);
+			piece.AddExplosionForce(100, transform.position, 1f);
+		}
+		StartCoroutine(HideBlock());
 	}
 	#endregion
 	#region Private
@@ -103,10 +128,23 @@ public class PlayerController : MonoBehaviour
 		Instance = this;
 		_audioSource = GetComponent<AudioSource>();
 
-		_countBlock = GameObject.FindGameObjectsWithTag("Block").Length;
-		if (_countBlock <= 0)
-			GameOver();
-    }
+		_startPosition = transform.position;
+		_piecesStartPosition = new Dictionary<int, Vector3>();
+		_piecesRigidbody = GetComponentsInChildren<Rigidbody>();
+		foreach (Rigidbody pieces in _piecesRigidbody)
+		{
+			var pos = pieces.gameObject.transform.position;
+            _piecesStartPosition.Add(pieces.GetInstanceID(), pos);
+			pieces.gameObject.SetActive(false);
+		}
+
+		foreach (Material m in Materials)
+		{
+			var color = m.color;
+			color.a = 1f;
+			m.color = color;
+		}
+	}
 
 	private void Start()
 	{
@@ -116,11 +154,26 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
+		if (Parameters.Instance.FixedGame)
+			return;
+
 		var pos = transform.position;
 		pos.x += Input.GetAxis("Horizontal") * FactorMove;
 		if (Mathf.Abs(pos.x) > MAX_X)
 			pos.x = ((pos.x < 0) ? -1 : 1) * MAX_X;
 		transform.position = pos;
+	}
+
+	private void OnApplicationQuit()
+	{
+#if (UNITY_EDITOR)
+		foreach (Material m in Materials)
+		{
+			var color = m.color;
+			color.a = 1f;
+			m.color = color;
+		}
+#endif
 	}
 
 	private void OnCollisionExit(Collision other)
@@ -131,6 +184,30 @@ public class PlayerController : MonoBehaviour
 				_audioSource.PlayOneShot(AudioRebound);
 		}
 	}
+
+	private void Reset()
+	{
+		transform.position = _startPosition;
+		foreach (GameObject obj in BaseObjects)
+			obj.SetActive(true);
+
+		foreach (Rigidbody pieces in _piecesRigidbody)
+		{
+			pieces.isKinematic = true;
+			pieces.isKinematic = false;
+			var id = pieces.GetInstanceID();
+			if (_piecesStartPosition.ContainsKey(id))
+				pieces.transform.position = _piecesStartPosition[id];
+			pieces.gameObject.SetActive(false);
+		}
+
+		foreach (Material m in Materials)
+		{
+			var color = m.color;
+			color.a = 1f;
+			m.color = color;
+		}
+	}
 	/// <summary>
 	/// Остновить игру и вывести на экран панель GameOver.
 	/// </summary>
@@ -138,6 +215,33 @@ public class PlayerController : MonoBehaviour
 	{
 		InterfaceController.Instance.GameOver(_score);
     }
+
+	private IEnumerator HideBlock()
+	{
+		Parameters.Instance.FixedGame = true;
+		var step = 0.05f;
+		var alpha = 1f;
+		while (alpha > 0)
+		{
+            foreach (Material m in Materials)
+			{
+				var color = m.color;
+				color.a -= step;
+				m.color = color;
+			}
+			alpha -= step;
+			yield return new WaitForSeconds(0.05f);
+		}
+
+		if (_gameOver)
+			GameOver();
+		else
+		{
+			Reset();
+			BallController.Instance.Reset();
+		}
+		Parameters.Instance.FixedGame = false;
+	}
 	#endregion
 	#endregion
 }

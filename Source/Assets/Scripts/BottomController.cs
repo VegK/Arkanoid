@@ -17,13 +17,16 @@ public class BottomController : MonoBehaviour
 
 	#endregion
 	#region Private
-	private void OnCollisionEnter(Collision other)
+	private void OnTriggerEnter(Collider other)
 	{
-		if (other.gameObject.tag == "Ball")
-		{
-			PlayerController.Instance.Life--;
-			BallController.Instance.Reset();
-		}
+		if (other.tag == "Ball")
+            PlayerController.Instance.Life--;
+	}
+
+	private void OnTriggerExit(Collider other)
+	{
+		if (other.tag == "Ball")
+			other.GetComponent<Rigidbody>().isKinematic = true;
 	}
 	#endregion
 	#endregion

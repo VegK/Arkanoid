@@ -38,6 +38,9 @@ public class BallController : MonoBehaviour
 
 	private void Update()
 	{
+		if (Parameters.Instance.FixedGame)
+			return;
+
 		if (_peace && Input.GetKey(KeyCode.Space))
 		{
 			_peace = false;
