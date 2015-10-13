@@ -17,6 +17,9 @@ public class Parameters : MonoBehaviour
 		}
 	}
 
+	[Header("Prefabs")]
+	public BonusController DivideBonus;
+
 	[HideInInspector]
 	public bool FixedGame;
 	#endregion
@@ -27,7 +30,21 @@ public class Parameters : MonoBehaviour
 
 	#region Methods
 	#region Public
-
+	/// <summary>
+	/// Получить префаб бонуса по типу бонуса. Возвращает NULL, если для типа бонуса нету
+	/// префаба.
+	/// </summary>
+	/// <param name="bonus">Тип бонуса.</param>
+	/// <returns>Префаб бонуса. Может вернуть NULL.</returns>
+	public GameObject GetPrefabBonus(BonusType bonus)
+	{
+		switch (bonus)
+		{
+			case BonusType.Divide:
+				return DivideBonus.gameObject;
+		}
+		return null;
+	}
 	#endregion
 	#region Private
 	private void Awake()

@@ -20,13 +20,22 @@ public class BottomController : MonoBehaviour
 	private void OnTriggerEnter(Collider other)
 	{
 		if (other.tag == "Ball")
-            PlayerController.Instance.Life--;
+		{
+			if (!BallController.DestroyBall(other.gameObject))
+				PlayerController.Instance.Life--;
+        }
 	}
 
 	private void OnTriggerExit(Collider other)
 	{
 		if (other.tag == "Ball")
+		{
 			other.GetComponent<Rigidbody>().isKinematic = true;
+		}
+		else if (other.gameObject.tag == "Bonus")
+		{
+			Destroy(other.gameObject);
+		}
 	}
 	#endregion
 	#endregion

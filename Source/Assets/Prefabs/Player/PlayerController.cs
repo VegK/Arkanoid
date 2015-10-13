@@ -119,6 +119,7 @@ public class PlayerController : MonoBehaviour
 			piece.gameObject.SetActive(true);
 			piece.AddExplosionForce(100, transform.position, 1f);
 		}
+		GetComponent<BoxCollider>().enabled = false;
 		StartCoroutine(HidePieces());
 	}
 	#endregion
@@ -211,6 +212,17 @@ public class PlayerController : MonoBehaviour
 				other.rigidbody.velocity = velocity;
 			}
 		}
+		else if (other.gameObject.tag == "Bonus")
+		{
+			var ctrl = other.gameObject.GetComponent<BonusController>();
+			switch (ctrl.Bonus)
+			{
+				case BonusType.Divide:
+					BallController.Instance.Divide();
+					break;
+			}
+			Destroy(other.gameObject);
+		}
 	}
 
 	private void OnCollisionExit(Collision other)
@@ -277,6 +289,13 @@ public class PlayerController : MonoBehaviour
 			Reset();
 			BallController.Instance.Reset();
 		}
+
+		// Очищаем сцену от бонусов.
+		var bonuses = FindObjectsOfType<BonusController>();
+		foreach (BonusController bonus in bonuses)
+			Destroy(bonus.gameObject);
+
+		GetComponent<BoxCollider>().enabled = true;
 		Parameters.Instance.FixedGame = false;
 	}
 	#endregion

@@ -7,6 +7,7 @@ public class BlockController : MonoBehaviour
 	#region Public
 	public int HitPoint = 1;
 	public int Score = 1;
+	public BonusType Bonus = BonusType.None;
 
 	public AudioClip AudioBlow;
 	public GameObject DestroyedBlock;
@@ -61,6 +62,14 @@ public class BlockController : MonoBehaviour
 				_meshRenderer.enabled = false;
 				_boxCollider.enabled = false;
 				StartCoroutine(ExplosionBlock());
+
+				// Выпадение из блока бонуса.
+				var obj = Parameters.Instance.GetPrefabBonus(Bonus);
+				if (obj != null)
+				{
+					var bonus = Instantiate(obj);
+					bonus.transform.position = transform.position;
+                }
 			}
 			else
 			{
