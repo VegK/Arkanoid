@@ -19,6 +19,7 @@ public class Parameters : MonoBehaviour
 
 	[Header("Prefabs")]
 	public BonusController DivideBonus;
+	public BonusController SlowBonus;
 
 	[HideInInspector]
 	public bool FixedGame;
@@ -42,7 +43,9 @@ public class Parameters : MonoBehaviour
 		{
 			case BonusType.Divide:
 				return DivideBonus.gameObject;
-		}
+			case BonusType.Slow:
+				return SlowBonus.gameObject;
+        }
 		return null;
 	}
 	#endregion

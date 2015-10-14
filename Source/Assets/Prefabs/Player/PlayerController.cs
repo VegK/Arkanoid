@@ -220,6 +220,9 @@ public class PlayerController : MonoBehaviour
 				case BonusType.Divide:
 					BallController.Instance.Divide();
 					break;
+				case BonusType.Slow:
+					BallController.Instance.Slow();
+					break;
 			}
 			Destroy(other.gameObject);
 		}

@@ -81,6 +81,27 @@ public class BallController : MonoBehaviour
 		rb.isKinematic = false;
 		rb.velocity = newVelocity;
 	}
+	/// <summary>
+	/// Замедлить все шарики.
+	/// </summary>
+	public void Slow()
+	{
+		if (Parameters.Instance.FixedGame)
+			return;
+
+		if (_peace)
+			GoBall();
+
+		var rateSlow = 20; // проценты
+
+		foreach (BallController ball in _balls)
+		{
+			var velocity = ball._rigidbody.velocity;
+            velocity.x -= velocity.x * rateSlow / 100;
+			velocity.y -= velocity.y * rateSlow / 100;
+			ball._rigidbody.velocity = velocity;
+        }
+	}
 	#endregion
 	#region Private
 	private void Awake()
