@@ -61,6 +61,10 @@ public class BallController : MonoBehaviour
 		if (_peace)
 			GoBall();
 
+		// Запрет на повторное разделение.
+		if (_balls.Count > 1)
+			return;
+
 		var rbThis = GetComponent<Rigidbody>();
 		var pos = transform.position;
 		var rot = transform.rotation;
