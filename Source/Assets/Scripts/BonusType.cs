@@ -9,7 +9,7 @@ public enum BonusType
 	/// </summary>
 	Expand,
 	/// <summary>
-	/// Делить.
+	/// Делить - появляется два дополнительных шарика.
 	/// </summary>
 	Divide,
 	/// <summary>
@@ -17,7 +17,7 @@ public enum BonusType
 	/// </summary>
 	Laser,
 	/// <summary>
-	/// Медленный.
+	/// Медленный - замедление всех шариков.
 	/// </summary>
 	Slow,
 	/// <summary>
@@ -25,11 +25,11 @@ public enum BonusType
 	/// </summary>
 	Break,
 	/// <summary>
-	/// Ловить.
+	/// Ловить - шарики прилепают к платформе.
 	/// </summary>
 	Catch,
 	/// <summary>
-	/// Игрок.
+	/// Игрок - дополнительная жизнь.
 	/// </summary>
 	Player
 }

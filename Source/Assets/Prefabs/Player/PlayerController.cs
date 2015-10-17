@@ -222,6 +222,9 @@ public class PlayerController : MonoBehaviour
 				case BonusType.Catch:
 					BallController.Catch();
 					break;
+				case BonusType.Player:
+					Life++;
+					break;
 			}
 			Destroy(other.gameObject);
 		}

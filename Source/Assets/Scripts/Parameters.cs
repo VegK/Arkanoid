@@ -21,6 +21,7 @@ public class Parameters : MonoBehaviour
 	public BonusController DivideBonus;
 	public BonusController SlowBonus;
 	public BonusController CatchBonus;
+	public BonusController PlayerBonus;
 
 	public static bool FixedGame { get; set; }
 	#endregion
@@ -47,7 +48,9 @@ public class Parameters : MonoBehaviour
 				return SlowBonus.gameObject;
 			case BonusType.Catch:
 				return CatchBonus.gameObject;
-		}
+			case BonusType.Player:
+				return PlayerBonus.gameObject;
+        }
 		return null;
 	}
 	#endregion
