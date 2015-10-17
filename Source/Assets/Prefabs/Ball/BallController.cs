@@ -21,9 +21,37 @@ public class BallController : MonoBehaviour
 	private static List<BallController> _balls = new List<BallController>();
 
 	private Vector3 _startPosition;
-	private bool _peace = true;
 	private Rigidbody _rigidbody;
 	private SphereCollider _sphereCollider;
+
+	/// <summary>
+	/// Отступ по X от центра платформы игрока.
+	/// </summary>
+	private float _indentPlayer;
+	/// <summary>
+	/// Работать через _peace.
+	/// </summary>
+	private bool _peaceValue;
+	/// <summary>
+	/// Покой.
+	/// </summary>
+	private bool _peace
+	{
+		get
+		{
+			return _peaceValue;
+		}
+		set
+		{
+			_peaceValue = value;
+			if (_peaceValue)
+			{
+				var ballX = transform.position.x;
+				var playerX = PlayerController.Instance.transform.position.x;
+				_indentPlayer = ballX - playerX;
+			}
+        }
+	}
 
 	private bool _catch;
 	private Vector3? _saveVelocity;
@@ -181,7 +209,7 @@ public class BallController : MonoBehaviour
 		if (_peace)
 		{
 			var pos = transform.position;
-			pos.x = PlayerController.Instance.transform.position.x;
+			pos.x = PlayerController.Instance.transform.position.x + _indentPlayer;
 			transform.position = pos;
 		}
 	}
