@@ -198,7 +198,7 @@ public class BallController : MonoBehaviour
 		_balls.Remove(this);
     }
 
-	private void Update()
+	private void LateUpdate()
 	{
 		if (Parameters.FixedGame)
 			return;
