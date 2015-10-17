@@ -20,9 +20,9 @@ public class Parameters : MonoBehaviour
 	[Header("Prefabs")]
 	public BonusController DivideBonus;
 	public BonusController SlowBonus;
+	public BonusController CatchBonus;
 
-	[HideInInspector]
-	public bool FixedGame;
+	public static bool FixedGame { get; set; }
 	#endregion
 	#region Private
 	private static Parameters _instance;
@@ -45,7 +45,9 @@ public class Parameters : MonoBehaviour
 				return DivideBonus.gameObject;
 			case BonusType.Slow:
 				return SlowBonus.gameObject;
-        }
+			case BonusType.Catch:
+				return CatchBonus.gameObject;
+		}
 		return null;
 	}
 	#endregion

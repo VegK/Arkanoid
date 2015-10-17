@@ -72,11 +72,15 @@ public class PlayerController : MonoBehaviour
 	private int _score;
 	[SerializeField]
 	private int _life = 3;
-	private AudioSource _audioSource;
 
-	private Vector3 _startPosition;
+	private AudioSource _audioSource;
+	private BoxCollider _boxCollider;
 	private Dictionary<int, Vector3> _piecesStartPosition;
 	private Rigidbody[] _piecesRigidbody;
+
+	private Vector3 _startPosition;
+	private float? _pointContactBallX;
+	private Vector3? _colliderSize;
 	#endregion
 	#endregion
 
@@ -111,23 +115,38 @@ public class PlayerController : MonoBehaviour
 		if (_audioSource != null && AudioDie != null)
 			_audioSource.PlayOneShot(AudioDie);
 
+		// Скрываем целые детали игрока.
 		foreach (GameObject obj in BaseObjects)
 			obj.SetActive(false);
 
+		// Показываем разбитого игрока.
 		foreach (Rigidbody piece in _piecesRigidbody)
 		{
 			piece.gameObject.SetActive(true);
 			piece.AddExplosionForce(100, transform.position, 1f);
 		}
-		GetComponent<BoxCollider>().enabled = false;
+
+		_boxCollider.enabled = false;
+
 		StartCoroutine(HidePieces());
 	}
+	/// <summary>
+	/// Получить размер коллайдера с учётом масштабирования (scale).
+	/// </summary>
+	/// <returns>Размер.</returns>
+	public Vector3 GetColliderSize()
+	{
+		if (!_colliderSize.HasValue)
+			_colliderSize = Vector3.Scale(_boxCollider.size, transform.localScale);
+        return _colliderSize.Value;
+    }
 	#endregion
 	#region Private
 	private void Awake()
 	{
 		Instance = this;
 		_audioSource = GetComponent<AudioSource>();
+		_boxCollider = GetComponent<BoxCollider>();
 
 		_startPosition = transform.position;
 		_piecesStartPosition = new Dictionary<int, Vector3>();
@@ -155,7 +174,7 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
-		if (Parameters.Instance.FixedGame)
+		if (Parameters.FixedGame)
 			return;
 
 		var pos = transform.position;
@@ -181,36 +200,13 @@ public class PlayerController : MonoBehaviour
 	{
 		if (other.gameObject.tag == "Ball")
 		{
-			// Отражаем шарик в обратном направлении.
-			var reflection = false;
-			var pointContact = other.contacts[0].point;
-			var velocity = other.rigidbody.velocity;
-			var pos = other.gameObject.transform.position;
+			// Запоминаем столкновения только для верхней части платформы.
+			var ball = other.gameObject.GetComponent<BallController>();
+			var topPointPlayer = transform.position.y + GetColliderSize().y / 2;
+			var topPointBall = ball.transform.position.y - ball.GetColliderSize().y;
 
-			if (pointContact.x > transform.position.x)
-			{
-				if (velocity.x < 0)
-				{
-					velocity.x *= -1;
-					pos.x += (pointContact.x - pos.x) * 2;
-					reflection = true;
-				}
-			}
-			else if (pointContact.x < transform.position.x)
-			{
-				if (velocity.x > 0)
-				{
-					velocity.x *= -1;
-					pos.x -= Mathf.Abs(pointContact.x - pos.x) * 2;
-					reflection = true;
-				}
-			}
-
-			if (reflection)
-			{
-				other.gameObject.transform.position = pos;
-				other.rigidbody.velocity = velocity;
-			}
+			if (topPointBall >= topPointPlayer)
+				_pointContactBallX = other.contacts[0].point.x - transform.position.x;
 		}
 		else if (other.gameObject.tag == "Bonus")
 		{
@@ -218,10 +214,13 @@ public class PlayerController : MonoBehaviour
 			switch (ctrl.Bonus)
 			{
 				case BonusType.Divide:
-					BallController.Instance.Divide();
+					BallController.Divide();
 					break;
 				case BonusType.Slow:
-					BallController.Instance.Slow();
+					BallController.Slow();
+					break;
+				case BonusType.Catch:
+					BallController.Catch();
 					break;
 			}
 			Destroy(other.gameObject);
@@ -234,7 +233,43 @@ public class PlayerController : MonoBehaviour
 		{
 			if (_audioSource != null && AudioRebound != null)
 				_audioSource.PlayOneShot(AudioRebound);
-		}
+
+			// Отражаем шарик в обратном направлении.
+			if (_pointContactBallX.HasValue)
+			{
+				var reflection = false;
+				var pointContactX = transform.position.x + _pointContactBallX.Value;
+				var velocity = other.rigidbody.velocity;
+				var pos = other.gameObject.transform.position;
+
+				if (pointContactX > transform.position.x)
+				{
+					if (velocity.x < 0)
+					{
+						velocity.x *= -1;
+						pos.x += (pointContactX - pos.x) * 2;
+						reflection = true;
+					}
+				}
+				else if (pointContactX < transform.position.x)
+				{
+					if (velocity.x > 0)
+					{
+						velocity.x *= -1;
+						pos.x -= Mathf.Abs(pointContactX - pos.x) * 2;
+						reflection = true;
+					}
+				}
+
+				if (reflection)
+				{
+					other.gameObject.transform.position = pos;
+					other.rigidbody.velocity = velocity;
+				}
+
+				_pointContactBallX = null;
+            }
+        }
 	}
 
 	private void Reset()
@@ -270,7 +305,9 @@ public class PlayerController : MonoBehaviour
 
 	private IEnumerator HidePieces()
 	{
-		Parameters.Instance.FixedGame = true;
+		Parameters.FixedGame = true;
+
+		// Плавное исчезновение частей игрока.
 		var step = 0.05f;
 		var alpha = 1f;
 		while (alpha > 0)
@@ -298,8 +335,9 @@ public class PlayerController : MonoBehaviour
 		foreach (BonusController bonus in bonuses)
 			Destroy(bonus.gameObject);
 
-		GetComponent<BoxCollider>().enabled = true;
-		Parameters.Instance.FixedGame = false;
+		_boxCollider.enabled = true;
+
+		Parameters.FixedGame = false;
 	}
 	#endregion
 	#endregion
