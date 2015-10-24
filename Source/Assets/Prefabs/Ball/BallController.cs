@@ -50,7 +50,7 @@ public class BallController : MonoBehaviour
 				var playerX = PlayerController.Instance.transform.position.x;
 				_indentPlayer = ballX - playerX;
 			}
-        }
+		}
 	}
 
 	private bool _catch;
@@ -160,7 +160,7 @@ public class BallController : MonoBehaviour
 		transform.position = _startPosition;
 		_peace = true;
 		_catch = false;
-    }
+	}
 	/// <summary>
 	/// Получить размер коллайдера с учётом масштабирования (scale).
 	/// </summary>
@@ -168,7 +168,7 @@ public class BallController : MonoBehaviour
 	public Vector3 GetColliderSize()
 	{
 		if (!_colliderSize.HasValue)
-            _colliderSize = _sphereCollider.radius * transform.localScale;
+			_colliderSize = _sphereCollider.radius * transform.localScale;
 		return _colliderSize.Value;
 	}
 	#endregion
@@ -186,7 +186,7 @@ public class BallController : MonoBehaviour
 			_startPosition = transform.position;
 
 		_balls.Add(this);
-    }
+	}
 
 	private void Start()
 	{
@@ -196,7 +196,7 @@ public class BallController : MonoBehaviour
 	private void OnDestroy()
 	{
 		_balls.Remove(this);
-    }
+	}
 
 	private void LateUpdate()
 	{
@@ -221,7 +221,7 @@ public class BallController : MonoBehaviour
 			// Не даём шарику прилипнуть, если точка конатка оказалась ниже платформы.
 			var plrCtrl = other.gameObject.GetComponent<PlayerController>();
 			var plrHeightHalf = plrCtrl.GetColliderSize().y / 2;
-            var topPointPlayer = plrCtrl.transform.position.y + plrHeightHalf;
+			var topPointPlayer = plrCtrl.transform.position.y + plrHeightHalf;
 			var downPointBall = transform.position.y - GetColliderSize().y;
 
 			if (downPointBall < topPointPlayer)
@@ -244,7 +244,7 @@ public class BallController : MonoBehaviour
 				transform.position = _pointContactPlayer.Value;
 			else
 				_pointContactPlayer = null;
-        }
+		}
 	}
 	/// <summary>
 	/// Запустить шарик.
@@ -260,7 +260,7 @@ public class BallController : MonoBehaviour
 		}
 		else
 			_rigidbody.AddForce(StartSpeed);
-    }
+	}
 	#endregion
 	#endregion
 }

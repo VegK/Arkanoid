@@ -50,7 +50,7 @@ public class Parameters : MonoBehaviour
 				return CatchBonus.gameObject;
 			case BonusType.Player:
 				return PlayerBonus.gameObject;
-        }
+		}
 		return null;
 	}
 	#endregion

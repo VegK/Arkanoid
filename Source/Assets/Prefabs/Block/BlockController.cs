@@ -16,7 +16,7 @@ public class BlockController : MonoBehaviour
 	private AudioSource _audioSource;
 	private MeshRenderer _meshRenderer;
 	private BoxCollider _boxCollider;
-    private GameObject _destroydBlock;
+	private GameObject _destroydBlock;
 	private Rigidbody[] _destroyedBlockPieces;
 	#endregion
 	#endregion
@@ -31,7 +31,7 @@ public class BlockController : MonoBehaviour
 		_audioSource = GetComponent<AudioSource>();
 		_meshRenderer = GetComponent<MeshRenderer>();
 		_boxCollider = GetComponent<BoxCollider>();
-    }
+	}
 
 	private void OnCollisionEnter(Collision other)
 	{
@@ -53,12 +53,12 @@ public class BlockController : MonoBehaviour
 					piece.AddExplosionForce(100, other.contacts[0].point, 1f);
 
 					var pieceMesh = piece.GetComponent<MeshRenderer>();
-                    var materialCount = pieceMesh.materials.Length;
+					var materialCount = pieceMesh.materials.Length;
 					var newMaterials = new Material[materialCount];
 					for (int i = 0; i < materialCount; i++)
 						newMaterials[i] = _meshRenderer.material;
 					pieceMesh.materials = newMaterials;
-                }
+				}
 				_meshRenderer.enabled = false;
 				_boxCollider.enabled = false;
 				StartCoroutine(ExplosionBlock());
@@ -69,7 +69,7 @@ public class BlockController : MonoBehaviour
 				{
 					var bonus = Instantiate(obj);
 					bonus.transform.position = transform.position;
-                }
+				}
 			}
 			else
 			{
@@ -91,7 +91,7 @@ public class BlockController : MonoBehaviour
 				for (int i = 0; i < l; i++)
 				{
 					var pieceMesh = piece.GetComponent<MeshRenderer>();
-                    var color = pieceMesh.materials[i].color;
+					var color = pieceMesh.materials[i].color;
 					color.a -= step;
 					pieceMesh.materials[i].color = color;
 				}

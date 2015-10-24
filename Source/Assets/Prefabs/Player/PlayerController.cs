@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
 				_gameOver = true;
 				DestroyPlayer();
 				return;
-            }
+			}
 
 			if (value > _life)
 				NewLive();
@@ -138,8 +138,8 @@ public class PlayerController : MonoBehaviour
 	{
 		if (!_colliderSize.HasValue)
 			_colliderSize = Vector3.Scale(_boxCollider.size, transform.localScale);
-        return _colliderSize.Value;
-    }
+		return _colliderSize.Value;
+	}
 	#endregion
 	#region Private
 	private void Awake()
@@ -154,7 +154,7 @@ public class PlayerController : MonoBehaviour
 		foreach (Rigidbody pieces in _piecesRigidbody)
 		{
 			var pos = pieces.gameObject.transform.position;
-            _piecesStartPosition.Add(pieces.GetInstanceID(), pos);
+			_piecesStartPosition.Add(pieces.GetInstanceID(), pos);
 			pieces.gameObject.SetActive(false);
 		}
 
@@ -196,7 +196,7 @@ public class PlayerController : MonoBehaviour
 #endif
 	}
 
-    private void OnCollisionEnter(Collision other)
+	private void OnCollisionEnter(Collision other)
 	{
 		if (other.gameObject.tag == "Ball")
 		{
@@ -271,8 +271,8 @@ public class PlayerController : MonoBehaviour
 				}
 
 				_pointContactBallX = null;
-            }
-        }
+			}
+		}
 	}
 
 	private void Reset()
@@ -304,7 +304,7 @@ public class PlayerController : MonoBehaviour
 	private void GameOver()
 	{
 		InterfaceController.Instance.GameOver(_score);
-    }
+	}
 
 	private IEnumerator HidePieces()
 	{
@@ -315,7 +315,7 @@ public class PlayerController : MonoBehaviour
 		var alpha = 1f;
 		while (alpha > 0)
 		{
-            foreach (Material m in Materials)
+			foreach (Material m in Materials)
 			{
 				var color = m.color;
 				color.a -= step;

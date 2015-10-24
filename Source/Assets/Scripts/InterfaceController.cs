@@ -67,7 +67,7 @@ public class InterfaceController : MonoBehaviour
 		Time.timeScale = 0;
 		PanelScore.SetActive(false);
 		PanelLife.SetActive(false);
-        FinalScore.text = FINAL_SCORE + finalScore;
+		FinalScore.text = FINAL_SCORE + finalScore;
 		PanelGameOver.SetActive(true);
 	}
 	#endregion

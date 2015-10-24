@@ -23,7 +23,7 @@ public class BottomController : MonoBehaviour
 		{
 			if (!BallController.DestroyBall(other.gameObject))
 				PlayerController.Instance.Life--;
-        }
+		}
 	}
 
 	private void OnTriggerExit(Collider other)
