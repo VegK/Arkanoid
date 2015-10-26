@@ -5,7 +5,7 @@ public enum BonusType
 {
 	None,
 	/// <summary>
-	/// Расширять.
+	/// Расширять - увеличивает платформу в 2 раза.
 	/// </summary>
 	Expand,
 	/// <summary>

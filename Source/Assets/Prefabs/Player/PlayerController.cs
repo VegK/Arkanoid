@@ -7,7 +7,9 @@ using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
+	// TODO: Реализовать расчёты отступов.
 	public const float MAX_X = 3.672f;
+	private const float OFFSET_X_SIDE = 0.84f;
 
 	#region Properties
 	#region Public
@@ -81,6 +83,11 @@ public class PlayerController : MonoBehaviour
 	private Vector3 _startPosition;
 	private float? _pointContactBallX;
 	private Vector3? _colliderSize;
+
+	private GameObject _leftSide;
+	private GameObject _centerSide;
+	private GameObject _rightSide;
+	private Vector3 _defaultCenterSideScale;
 	#endregion
 	#endregion
 
@@ -164,6 +171,12 @@ public class PlayerController : MonoBehaviour
 			color.a = 1f;
 			m.color = color;
 		}
+
+		_leftSide = GameObject.Find("Left");
+		_centerSide = GameObject.Find("Center");
+		_rightSide = GameObject.Find("Right");
+		if (_centerSide != null)
+			_defaultCenterSideScale = _centerSide.transform.localScale;
 	}
 
 	private void Start()
@@ -177,10 +190,15 @@ public class PlayerController : MonoBehaviour
 		if (Parameters.FixedGame)
 			return;
 
+		// HACK: переделать всё на авто-расчёт
+		var max_pos_x = MAX_X;
+		if (_defaultCenterSideScale.x != _centerSide.transform.localScale.x)
+			max_pos_x -= OFFSET_X_SIDE / 2;
+
 		var pos = transform.position;
 		pos.x += Input.GetAxis("Horizontal") * FactorMove;
-		if (Mathf.Abs(pos.x) > MAX_X)
-			pos.x = ((pos.x < 0) ? -1 : 1) * MAX_X;
+		if (Mathf.Abs(pos.x) > max_pos_x)
+			pos.x = ((pos.x < 0) ? -1 : 1) * max_pos_x;
 		transform.position = pos;
 	}
 
@@ -213,13 +231,19 @@ public class PlayerController : MonoBehaviour
 			var ctrl = other.gameObject.GetComponent<BonusController>();
 			switch (ctrl.Bonus)
 			{
+				case BonusType.Expand:
+					Expand();
+					break;
 				case BonusType.Divide:
+					ResetSize();
 					BallController.Divide();
 					break;
 				case BonusType.Slow:
+					ResetSize();
 					BallController.Slow();
 					break;
 				case BonusType.Catch:
+					ResetSize();
 					BallController.Catch();
 					break;
 				case BonusType.Player:
@@ -277,6 +301,7 @@ public class PlayerController : MonoBehaviour
 
 	private void Reset()
 	{
+		ResetSize();
 		transform.position = _startPosition;
 		foreach (GameObject obj in BaseObjects)
 			obj.SetActive(true);
@@ -341,6 +366,56 @@ public class PlayerController : MonoBehaviour
 		_boxCollider.enabled = true;
 
 		Parameters.FixedGame = false;
+	}
+	/// <summary>
+	/// Увеличить платформу в 2 раза.
+	/// </summary>
+	private void Expand()
+	{
+		if (_leftSide == null || _centerSide == null || _rightSide == null)
+		{
+			Debug.Log("Ошибка. Отсутствует ссылка на одну из частей платформы.");
+			return;
+		}
+
+		if (_centerSide.transform.localScale != _defaultCenterSideScale)
+			return;
+
+		var scale = Vector3.Scale(_defaultCenterSideScale, new Vector3(2, 1, 1));
+		_centerSide.transform.localScale = scale;
+
+		// Перемещаем левую и правую часть платформы в правильную позицию.
+		var pos = _leftSide.transform.localPosition;
+		pos.x -= OFFSET_X_SIDE;
+		_leftSide.transform.localPosition = pos;
+
+		pos = _rightSide.transform.localPosition;
+		pos.x += OFFSET_X_SIDE;
+		_rightSide.transform.localPosition = pos;
+
+		// Увеличиваем коллайдер платформы.
+		scale = Vector3.Scale(_boxCollider.size, new Vector3(2, 1, 1));
+		_boxCollider.size = scale;
+	}
+	/// <summary>
+	/// Восстановить размер платформы игрока.
+	/// </summary>
+	private void ResetSize()
+	{
+		_centerSide.transform.localScale = _defaultCenterSideScale;
+
+		// Перемещаем левую и правую часть платформы в начальную позицию.
+		var pos = _leftSide.transform.localPosition;
+		pos.x += OFFSET_X_SIDE;
+		_leftSide.transform.localPosition = pos;
+
+		pos = _rightSide.transform.localPosition;
+		pos.x -= OFFSET_X_SIDE;
+		_rightSide.transform.localPosition = pos;
+
+		// Уменьшаем коллайдер платформы.
+		var scale = Vector3.Scale(_boxCollider.size, new Vector3(0.5f, 1, 1));
+		_boxCollider.size = scale;
 	}
 	#endregion
 	#endregion
