@@ -42,7 +42,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-*.meta
 /*/*
 /Source/*
 /Source/Assets/UnityVS
