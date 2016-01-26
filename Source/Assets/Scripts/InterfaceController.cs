@@ -75,7 +75,6 @@ public class InterfaceController : MonoBehaviour
 	private void Awake()
 	{
 		_instance = this;
-		GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceCamera;
 	}
 	#endregion
 	#endregion
