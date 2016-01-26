@@ -18,6 +18,7 @@ public class Parameters : MonoBehaviour
 	}
 
 	[Header("Prefabs")]
+	public BonusController ExpandBonus;
 	public BonusController DivideBonus;
 	public BonusController SlowBonus;
 	public BonusController CatchBonus;
@@ -42,6 +43,8 @@ public class Parameters : MonoBehaviour
 	{
 		switch (bonus)
 		{
+			case BonusType.Expand:
+				return ExpandBonus.gameObject;
 			case BonusType.Divide:
 				return DivideBonus.gameObject;
 			case BonusType.Slow:

@@ -87,7 +87,10 @@ public class PlayerController : MonoBehaviour
 	private GameObject _leftSide;
 	private GameObject _centerSide;
 	private GameObject _rightSide;
+	private Vector3 _defaultLeftSidePosition;
+	private Vector3 _defaultRightSidePosition;
 	private Vector3 _defaultCenterSideScale;
+	private Vector3 _defaultCollider;
 	#endregion
 	#endregion
 
@@ -177,6 +180,10 @@ public class PlayerController : MonoBehaviour
 		_rightSide = GameObject.Find("Right");
 		if (_centerSide != null)
 			_defaultCenterSideScale = _centerSide.transform.localScale;
+		_defaultCollider = _boxCollider.size;
+
+		_defaultLeftSidePosition = _leftSide.transform.localPosition;
+		_defaultRightSidePosition = _rightSide.transform.localPosition;
 	}
 
 	private void Start()
@@ -402,20 +409,11 @@ public class PlayerController : MonoBehaviour
 	/// </summary>
 	private void ResetSize()
 	{
+		_boxCollider.size = _defaultCollider;
+
+		_leftSide.transform.localPosition = _defaultLeftSidePosition;
 		_centerSide.transform.localScale = _defaultCenterSideScale;
-
-		// Перемещаем левую и правую часть платформы в начальную позицию.
-		var pos = _leftSide.transform.localPosition;
-		pos.x += OFFSET_X_SIDE;
-		_leftSide.transform.localPosition = pos;
-
-		pos = _rightSide.transform.localPosition;
-		pos.x -= OFFSET_X_SIDE;
-		_rightSide.transform.localPosition = pos;
-
-		// Уменьшаем коллайдер платформы.
-		var scale = Vector3.Scale(_boxCollider.size, new Vector3(0.5f, 1, 1));
-		_boxCollider.size = scale;
+		_rightSide.transform.localPosition = _defaultRightSidePosition;
 	}
 	#endregion
 	#endregion
