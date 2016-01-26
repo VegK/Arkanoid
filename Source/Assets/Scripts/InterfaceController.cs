@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class InterfaceController : MonoBehaviour
@@ -40,7 +40,7 @@ public class InterfaceController : MonoBehaviour
 	public void OnClickRestart()
 	{
 		Time.timeScale = 1;
-		Application.LoadLevel(Application.loadedLevel);
+		SceneManager.LoadScene(0);
 	}
 	/// <summary>
 	/// Изменить счёт.
