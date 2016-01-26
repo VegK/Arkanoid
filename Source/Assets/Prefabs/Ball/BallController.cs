@@ -31,7 +31,7 @@ public class BallController : MonoBehaviour
 	/// <summary>
 	/// Работать через _peace.
 	/// </summary>
-	private bool _peaceValue;
+	private bool _peaceValue = true;
 	/// <summary>
 	/// Покой.
 	/// </summary>
@@ -186,11 +186,6 @@ public class BallController : MonoBehaviour
 			_startPosition = transform.position;
 
 		_balls.Add(this);
-	}
-
-	private void Start()
-	{
-		_peace = true;
 	}
 
 	private void OnDestroy()
